@@ -14,8 +14,8 @@ class MoMoSMSParser:
         self.patterns = {
             # Payment out patterns (TxId: format)
             'payment_out': [
-                r'TxId:\s*(\d+)\.\s*Your payment of ([\d,]+)\s*RWF to ([^\d]+)\s*(\d+)\s*has been completed at ([\d\-\s:]+)\. Your new balance:\s*([\d,]+)\s*RWF\. Fee was\s*(\d+)\s*RWF',
-                r'TxId:\s*(\d+)\.\s*Your payment of ([\d,]+)\s*RWF to ([^\d]+)\s*(\d+)\s*has been completed at ([\d\-\s:]+)\. Your new balance:\s*([\d,]+)\s*RWF\. Fee was\s*(\d+)\s*RWF'
+                r'TxId:\s*(\d+)\.\s*Your payment of ([\d,]+)\s*RWF to ([^\d]*?)\s*(\d*)\s*has been completed at ([\d\-\s:]+)\. Your new balance:\s*([\d,]+)\s*RWF\. Fee was\s*(\d+)\s*RWF',
+                r'TxId:\s*(\d+)\.\s*Your payment of ([\d,]+)\s*RWF to ([^\s]+(?:\s+[^\s]+)*)\s+has been completed at ([\d\-\s:]+)\. Your new balance:\s*([\d,]+)\s*RWF\. Fee was\s*(\d+)\s*RWF'
             ],
             
             # Transfer out patterns (*165*S* format)
@@ -71,19 +71,31 @@ class MoMoSMSParser:
     
     def parse_payment_out(self, message: str) -> Optional[Dict]:
         """Parse outgoing payment messages."""
-        for pattern in self.patterns['payment_out']:
+        for i, pattern in enumerate(self.patterns['payment_out']):
             match = re.search(pattern, message, re.IGNORECASE | re.DOTALL)
             if match:
-                return {
-                    'tx_id': match.group(1),
-                    'amount': self.clean_amount(match.group(2)),
-                    'receiver_name': match.group(3).strip(),
-                    'receiver_code': match.group(4),
-                    'timestamp': self.parse_datetime(match.group(5)),
-                    'new_balance': self.clean_amount(match.group(6)),
-                    'fee': self.clean_amount(match.group(7)),
-                    'message_type': 'payment_out'
-                }
+                if i == 0:  # First pattern with separate receiver code
+                    return {
+                        'tx_id': match.group(1),
+                        'amount': self.clean_amount(match.group(2)),
+                        'receiver_name': match.group(3).strip(),
+                        'receiver_code': match.group(4) if match.group(4) else '',
+                        'timestamp': self.parse_datetime(match.group(5)),
+                        'new_balance': self.clean_amount(match.group(6)),
+                        'fee': self.clean_amount(match.group(7)),
+                        'message_type': 'payment_out'
+                    }
+                else:  # Second pattern without separate receiver code
+                    return {
+                        'tx_id': match.group(1),
+                        'amount': self.clean_amount(match.group(2)),
+                        'receiver_name': match.group(3).strip(),
+                        'receiver_code': '',
+                        'timestamp': self.parse_datetime(match.group(4)),
+                        'new_balance': self.clean_amount(match.group(5)),
+                        'fee': self.clean_amount(match.group(6)),
+                        'message_type': 'payment_out'
+                    }
         return None
     
     def parse_transfer_out(self, message: str) -> Optional[Dict]:
