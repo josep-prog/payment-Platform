@@ -1,1 +1,64 @@
-services:\n  - type: web\n    name: momo-payment-verification\n    env: python\n    plan: free\n    buildCommand: pip install -r requirements.txt\n    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app --workers 2 --timeout 120\n    envVars:\n      - key: FLASK_ENV\n        value: production\n      - key: PYTHON_VERSION\n        value: 3.11.7\n      - key: PORT\n        generateValue: true\n      - key: FLASK_SECRET_KEY\n        generateValue: true\n      - key: SUPABASE_URL\n        sync: false  # You'll need to set this manually\n      - key: SUPABASE_ANON_KEY\n        sync: false  # You'll need to set this manually\n      - key: DEFAULT_VERIFICATION_CODE\n        value: \"1043577\"\n      - key: FRAUD_DETECTION_ENABLED\n        value: \"true\"\n      - key: LOG_LEVEL\n        value: INFO\n    healthCheckPath: /api/health\n    disk:\n      name: momo-disk\n      mountPath: /opt/render/project/logs\n      sizeGB: 1\n    autoDeploy: true\n    \n    # Environment-specific settings\n    region: oregon  # Choose region closest to your users\n    \n    # Headers for better security\n    headers:\n      - path: /*\n        name: X-Frame-Options\n        value: DENY\n      - path: /*\n        name: X-Content-Type-Options\n        value: nosniff\n      - path: /*\n        name: Referrer-Policy\n        value: strict-origin-when-cross-origin\n      - path: /*\n        name: Permissions-Policy\n        value: geolocation=(), microphone=(), camera=()\n\n# Additional configuration\nbuildFilter:\n  paths:\n    - app.py\n    - requirements.txt\n    - ml_models/**\n    - templates/**\n    - database/**\n  ignoredPaths:\n    - tests/**\n    - .git/**\n    - *.md\n    - .env*
+services:
+  - type: web
+    name: momo-payment-verification
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app --workers 2 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.10
+      - key: PORT
+        generateValue: true
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false  # You'll need to set this manually
+      - key: SUPABASE_ANON_KEY
+        sync: false  # You'll need to set this manually
+      - key: DEFAULT_VERIFICATION_CODE
+        value: "1043577"
+      - key: FRAUD_DETECTION_ENABLED
+        value: "true"
+      - key: LOG_LEVEL
+        value: INFO
+    healthCheckPath: /api/health
+    disk:
+      name: momo-disk
+      mountPath: /opt/render/project/logs
+      sizeGB: 1
+    autoDeploy: true
+    
+    # Environment-specific settings
+    region: oregon  # Choose region closest to your users
+    
+    # Headers for better security
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: geolocation=(), microphone=(), camera=()
+
+# Additional configuration
+buildFilter:
+  paths:
+    - app.py
+    - requirements.txt
+    - ml_models/**
+    - templates/**
+    - database/**
+  ignoredPaths:
+    - tests/**
+    - .git/**
+    - *.md
+    - .env*

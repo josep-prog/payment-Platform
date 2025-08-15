@@ -1,34 +1,28 @@
 # Flask and web framework
-Flask==3.0.0
-Flask-CORS==4.0.0
+Flask==3.0.3
+Flask-CORS==4.0.1
 
 # Database and Supabase
-supabase==2.3.0
+supabase==2.7.4
 psycopg2-binary==2.9.9
 
 # Environment and configuration
-python-dotenv==1.0.0
+python-dotenv==1.0.1
 
-# Data processing and ML
-numpy==1.26.3
-pandas==2.2.0
-scipy==1.12.0
-
-# Date and time handling
-python-dateutil==2.8.2
+# Date and time handling (built-in to Python, but explicit for clarity)
+python-dateutil==2.9.0
 
 # HTTP requests
-requests==2.31.0
+requests==2.32.3
 
 # Production server
-gunicorn==21.2.0
+gunicorn==23.0.0
 
-# Utilities
+# Essential utilities (most are Flask dependencies)
 click==8.1.7
-Werkzeug==3.0.1
-Jinja2==3.1.3
-MarkupSafe==2.1.4
+Werkzeug==3.0.3
+Jinja2==3.1.4
+MarkupSafe==2.1.5
 
-# Development and testing (optional, will be excluded in production)
-pytest==7.4.4
-pytest-flask==1.3.0
+# JSON handling
+simplejson==3.19.3
