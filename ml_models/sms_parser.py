@@ -205,6 +205,8 @@ class MoMoSMSParser:
                 return 'airtime'
             elif 'electricity units' in message_lower or 'cash power' in message_lower:
                 return 'electricity'
+            elif 'test merchant' in message_lower:
+                return 'payment_out'
             else:
                 return 'payment_out'
         elif 'you have received' in message_lower:
